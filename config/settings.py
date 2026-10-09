@@ -1,11 +1,13 @@
 import os
 from pathlib import Path
 
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "dev-only-change-this-key"
+    "dev-only-change-this-key",
 )
 
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
@@ -14,9 +16,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "ALLOWED_HOSTS",
-         "eleganzo-mir.onrender.com",
-    "localhost",
-    "127.0.0.1",
+        "eleganzo-mir.onrender.com,localhost,127.0.0.1",
     ).split(",")
     if host.strip()
 ]
@@ -59,8 +59,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-import dj_database_url
 
 DATABASES = {
     "default": dj_database_url.config(
