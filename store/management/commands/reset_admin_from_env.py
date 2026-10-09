@@ -1,4 +1,5 @@
 
+
 import os
 
 from django.core.management.base import BaseCommand, CommandError
@@ -15,38 +16,32 @@ class Command(BaseCommand):
 
         User = get_user_model()
 
-        old_username = os.environ.get(
-            "RESET_ADMIN_CURRENT_USERNAME", "mirlan"
-        )
-        new_username = os.environ.get("RESET_ADMIN_USERNAME", "").strip()
-        new_email = os.environ.get("RESET_ADMIN_EMAIL", "").strip()
-        new_password = os.environ.get("RESET_ADMIN_PASSWORD", "")
+        username = os.environ.get(
+            "RESET_ADMIN_USERNAME", "eleganzo_admin"
+        ).strip()
+        email = os.environ.get("RESET_ADMIN_EMAIL", "").strip()
+        password = os.environ.get("RESET_ADMIN_PASSWORD", "")
 
-        if not new_username or not new_email or len(new_password) < 12:
+        if not username or not email or len(password) < 12:
             raise CommandError(
-                "Set new username, email and password (12+ characters)."
+                "Set RESET_ADMIN_USERNAME, RESET_ADMIN_EMAIL "
+                "and RESET_ADMIN_PASSWORD (12+ characters)."
             )
 
-        try:
-            user = User.objects.get(
-                username=old_username,
-                is_superuser=True,
-            )
-        except User.DoesNotExist:
-            raise CommandError(
-                f"Superuser '{old_username}' not found in this database."
-            )
+        user = User.objects.filter(username=username).first()
 
-        if User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
-            raise CommandError("The new username is already taken.")
+        if user is None:
+            user = User(username=username)
 
-        user.username = new_username
-        user.email = new_email
-        user.set_password(new_password)
+        user.email = email
+        user.is_staff = True
+        user.is_superuser = True
+        user.is_active = True
+        user.set_password(password)
         user.save()
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Admin updated: {user.username} / {user.email}"
+                f"Admin is ready: {user.username} / {user.email}"
             )
         )
