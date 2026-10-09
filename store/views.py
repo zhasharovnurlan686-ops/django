@@ -1,4 +1,3 @@
-
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -22,7 +21,7 @@ def products_api(request):
         if product.image:
             image = product.image.url
         else:
-            image = product.image_url
+            image = product.image_url or ""
 
         data.append({
             "id": product.pk,
