@@ -764,6 +764,25 @@ img{
     font-size:14px;
     font-weight:600;
 }
+.product-prices {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.product-old-price {
+    color: #888;
+    text-decoration: line-through;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.product-current-price {
+    color: #c7ad7b;
+    font-size: 14px;
+    font-weight: 600;
+}
 
 .product-stock{
     font-size:9px;
@@ -3417,9 +3436,12 @@ function renderProducts(){
 
                 <div class="product-bottom">
 
-                    <div class="product-price">
-                        ${formatMoney(product.price)}
-                    </div>
+                    <div class="product-prices">
+    ${product.oldPrice && Number(product.oldPrice) > Number(product.price)
+        ? `<span class="product-old-price">${formatMoney(product.oldPrice)}</span>`
+        : ""}
+    <span class="product-current-price">${formatMoney(product.price)}</span>
+</div>
 
                     <div class="product-stock ${product.stock <= 0 ? "out":""}">
                         ${product.stock > 0
@@ -3589,9 +3611,12 @@ function sortProducts(type){
 
                 <div class="product-bottom">
 
-                    <div class="product-price">
-                        ${formatMoney(product.price)}
-                    </div>
+                    <div class="product-prices">
+    ${product.oldPrice && Number(product.oldPrice) > Number(product.price)
+        ? `<span class="product-old-price">${formatMoney(product.oldPrice)}</span>`
+        : ""}
+    <span class="product-current-price">${formatMoney(product.price)}</span>
+</div>
 
                     <div class="product-stock">
                         ${product.stock > 0
