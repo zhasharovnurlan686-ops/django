@@ -2893,8 +2893,7 @@ img{
                     <input
                         type="file"
                         id="receipt"
-                        accept="image/jpeg,image/png,image/webp,application/pdf"
-                        required>
+                        accept="image/jpeg,image/png,image/webp,application/pdf">
 
                 </div>
 
@@ -3162,16 +3161,43 @@ async function loadProducts(){
 
         products = Array.isArray(data)
             ? data
-                .filter(product => product && product.active !== false)
-                .map(product => ({
-                    ...product,
-                    categoryName: product.categoryName || product.category || "Без категории",
-                    category: product.category || "other",
-                    badge: product.badge || "",
-                    variants: Array.isArray(product.variants) ? product.variants : [],
-                    description: product.description || "",
-                    image: product.image || ""
-                }))
+                .filter(product => product && product.active !== false && product.is_active !== false)
+                .map(product => {
+                    const rawCategory = product.category;
+                    const categoryName = product.categoryName || product.category_name ||
+                        (rawCategory && typeof rawCategory === "object"
+                            ? (rawCategory.name || rawCategory.title || rawCategory.slug || "")
+                            : (typeof rawCategory === "string" ? rawCategory : "")) ||
+                        product.category_display || "Без категории";
+                    const rawCategoryKey = (product.category_slug ||
+                        (rawCategory && typeof rawCategory === "object"
+                            ? (rawCategory.slug || rawCategory.key || rawCategory.name || rawCategory.title)
+                            : rawCategory) ||
+                        categoryName || "").toString().trim().toLowerCase();
+                    const categoryText = (rawCategoryKey + " " + categoryName.toLowerCase())
+                        .replace(/ё/g, "е").replace(/[_-]+/g, " ").trim();
+                    let category = "other";
+                    if (/дрон|drone|квадрокоптер/.test(categoryText)) category = "drones";
+                    else if (/инструмент|tool/.test(categoryText)) category = "tools";
+                    else if (/для дома|дом|home|кухн/.test(categoryText)) category = "home";
+                    else if (/для детей|детск|ребен|ребён|children|kids|toy/.test(categoryText)) category = "children";
+                    else if (/для телефона|телефон|phone|аксессуар/.test(categoryText)) category = "phones";
+                    else if (/электроник|electronics|ноутбук|компьютер|техник/.test(categoryText)) category = "electronics";
+                    const price = Number(product.price ?? product.price_som ?? product.cost ?? 0);
+                    return {
+                        ...product,
+                        id: product.id,
+                        name: product.name || product.title || product.product_name || "Товар",
+                        price: Number.isFinite(price) ? price : 0,
+                        categoryName,
+                        category,
+                        badge: product.badge || "",
+                        variants: Array.isArray(product.variants) ? product.variants : [],
+                        description: product.description || "",
+                        image: product.image || product.image_url || product.photo || "",
+                        stock: Number(product.stock ?? product.quantity ?? product.count ?? 0)
+                    };
+                })
             : [];
 
         productsLoaded = true;
@@ -4130,19 +4156,17 @@ async function submitOrder(event){
     const receipt = document.getElementById("receipt");
     const receiptError = document.getElementById("receiptError");
     receiptError.style.display = "none";
-    if(!receipt.files.length){
-      receiptError.textContent = language === "kg" ? "Жеткирүү төлөмүнүн дүмүрчөгүн жүктөңүз." : "Загрузите чек об оплате доставки.";
-      receiptError.style.display = "block"; return;
-    }
-    const file = receipt.files[0];
-    const allowed = ["image/jpeg","image/png","image/webp","application/pdf"];
-    if(!allowed.includes(file.type)){
-      receiptError.textContent = language === "kg" ? "JPG, PNG, WEBP же PDF файлдарына уруксат берилет." : "Допустимы JPG, PNG, WEBP или PDF.";
-      receiptError.style.display = "block"; return;
-    }
-    if(file.size > 10 * 1024 * 1024){
-      receiptError.textContent = language === "kg" ? "Файл 10 МБдан чоң болбошу керек." : "Размер файла не должен превышать 10 МБ.";
-      receiptError.style.display = "block"; return;
+    const file = receipt && receipt.files ? receipt.files[0] : null;
+    if(file){
+      const allowed = ["image/jpeg","image/png","image/webp","application/pdf"];
+      if(!allowed.includes(file.type)){
+        receiptError.textContent = language === "kg" ? "JPG, PNG, WEBP же PDF файлдарына уруксат берилет." : "Допустимы JPG, PNG, WEBP или PDF.";
+        receiptError.style.display = "block"; return;
+      }
+      if(file.size > 10 * 1024 * 1024){
+        receiptError.textContent = language === "kg" ? "Файл 10 МБдан чоң болбошу керек." : "Размер файла не должен превышать 10 МБ.";
+        receiptError.style.display = "block"; return;
+      }
     }
     const region = document.getElementById("region").value;
     if(!region){ showToast(language === "kg" ? "Облусту тандаңыз" : "Выберите область"); return; }
@@ -4161,7 +4185,17 @@ async function submitOrder(event){
         city: document.getElementById("city").value.trim(),
         address: document.getElementById("address").value.trim()
       };
-      const items = cart.map(item => ({...item}));
+      const items = cart.map(item => {
+        const product = products.find(p => String(p.id) === String(item.id));
+        return {
+          ...item,
+          name: product ? product.name : (item.name || item.title || "Товар"),
+          title: product ? product.name : (item.title || item.name || "Товар"),
+          price: Number(product ? product.price : item.price) || 0,
+          categoryName: product ? product.categoryName : (item.categoryName || "Без категории"),
+          image: product ? product.image : (item.image || "")
+        };
+      });
       const subtotal = items.reduce((sum,item)=>sum+(Number(item.price)||0)*(Number(item.quantity)||Number(item.qty)||1),0);
       const delivery = Number(CONFIG.delivery[region] || 0);
       const itemLines = items.map((item,index)=>{
@@ -4186,11 +4220,11 @@ async function submitOrder(event){
         `Доставка: ${delivery} сом`,
         `ИТОГО: ${subtotal+delivery} сом`,
         "",
-        `Чек оплаты доставки выбран: ${file.name}`,
-        "⚠️ Чек не прикрепляется автоматически. Клиенту нужно прикрепить файл вручную в этом чате WhatsApp."
+        `Оплата доставки: ${file ? "чек выбран (" + file.name + "), ожидает проверки" : "чек не загружен, оплата не подтверждена"}`,
+        "Примечание: файл чека не передаётся автоматически в WhatsApp. При необходимости его можно отправить отдельно; прикрепление чека на сайте необязательно."
       ].join("\n");
 
-      const order = {number:orderNumber, createdAt:new Date().toISOString(), customer, items, subtotal, delivery, total:subtotal+delivery, receiptFileName:file.name, status:"ОЖИДАЕТ ПРОВЕРКИ ОПЛАТЫ ДОСТАВКИ"};
+      const order = {number:orderNumber, createdAt:new Date().toISOString(), customer, items, subtotal, delivery, total:subtotal+delivery, receiptFileName:file ? file.name : null, paymentStatus:file ? "Чек выбран — ожидает проверки" : "Чек не загружен — оплата не подтверждена", status:"ОЖИДАЕТ ПРОВЕРКИ ОПЛАТЫ ДОСТАВКИ"};
       localStorage.setItem("last_eleganzo_order", JSON.stringify(order));
       const whatsappUrl = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(message)}`;
       // Open WhatsApp with every checkout field prefilled. The receipt file must be attached manually.
