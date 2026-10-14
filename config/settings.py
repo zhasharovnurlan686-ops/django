@@ -55,12 +55,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
+        conn_health_checks=True,
     )
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -98,7 +101,10 @@ STORAGES = {
 }
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = os.environ.get(
+    "MEDIA_ROOT",
+    str(BASE_DIR / "media"),
+)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
