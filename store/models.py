@@ -1,4 +1,3 @@
-
 from django.db import models
 
 
@@ -90,3 +89,23 @@ class Product(models.Model):
         ordering = ["-created_at"]
         verbose_name = "товар"
         verbose_name_plural = "Товары"
+
+
+class MediaBlob(models.Model):
+    path = models.CharField(
+        max_length=500,
+        unique=True,
+    )
+    data = models.BinaryField()
+    content_type = models.CharField(
+        max_length=100,
+        default="application/octet-stream",
+    )
+    size = models.PositiveBigIntegerField(default=0)
+
+    def __str__(self):
+        return self.path
+
+    class Meta:
+        verbose_name = "файл изображения"
+        verbose_name_plural = "Файлы изображений"

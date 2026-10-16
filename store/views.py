@@ -1,7 +1,7 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, Http404
 from django.shortcuts import render
 
-from .models import Product
+from .models import Product, MediaBlob
 
 
 def home(request):
@@ -51,3 +51,19 @@ def products_api(request):
         })
 
     return JsonResponse(data, safe=False)
+
+
+def database_image(request, path):
+    try:
+        image = MediaBlob.objects.get(path=path)
+    except MediaBlob.DoesNotExist:
+        raise Http404("Изображение не найдено")
+
+    response = HttpResponse(
+        bytes(image.data),
+        content_type=image.content_type,
+    )
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "public, max-age=86400"
+
+    return response
