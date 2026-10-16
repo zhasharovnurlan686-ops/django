@@ -4280,13 +4280,16 @@ async function submitOrder(event){
         const product = products.find(p => String(p.id) === String(item.id));
         return {
           ...item,
-          name: product ? product.name : (item.name || item.title || "Товар"),
-          title: product ? product.name : (item.title || item.name || "Товар"),
+          name: product ? product.name : (item.name || item.title || ""),
+          title: product ? product.name : (item.title || item.name || ""),
           price: Number(product ? product.price : item.price) || 0,
-          categoryName: product ? product.categoryName : (item.categoryName || "Без категории"),
+          categoryName: product ? product.categoryName : (item.categoryName || ""),
           image: product ? product.image : (item.image || "")
         };
-      });
+      }).filter(item =>
+        (item.name || item.title || "").trim() !== "" &&
+        Number(item.price) > 0
+      );
       const subtotal = items.reduce((sum,item)=>sum+(Number(item.price)||0)*(Number(item.quantity)||Number(item.qty)||1),0);
       const delivery = Number(CONFIG.delivery[region] || 0);
       const itemLines = items.map((item,index)=>{
