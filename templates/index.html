@@ -1865,6 +1865,75 @@ img{
 
 }
 
+
+
+/* =====================================
+   ELEGANZO BRAND THEME — logo-matched colors
+   Existing catalog, cart, checkout and JavaScript behavior are preserved.
+===================================== */
+:root{
+    --black:#090b18;
+    --black2:#0d1021;
+    --black3:#151a30;
+    --cream:#f2f4fb;
+    --cream2:#e5e9f5;
+    --white:#ffffff;
+    --gold:#a43cff;
+    --gold2:#27d9ff;
+    --gray:#9ba5c4;
+    --gray2:#727d9f;
+    --line:rgba(164,60,255,.22);
+    --darkline:rgba(13,16,33,.14);
+    --shadow:0 25px 80px rgba(0,0,0,.35);
+}
+body{background:#f2f4fb;color:#11152b}
+.loader,.hero,.section-dark,.footer{background:#090b18}
+.header.scrolled{background:rgba(9,11,24,.91);border-bottom-color:rgba(39,217,255,.16)}
+.logo{display:flex;align-items:center;letter-spacing:0}
+.brand-logo{display:block;object-fit:contain;background:#090b18}
+.header-brand-logo{width:150px;height:65px;object-fit:contain;border-radius:8px}
+.loader-brand-logo{width:min(280px,70vw);height:auto;margin:0 auto 8px;border-radius:14px}
+.footer-brand-logo{width:190px;height:100px;border-radius:10px}
+.loader-line{background:linear-gradient(90deg,#ff9d00,#ff00b7,#20dfff);height:2px}
+.hero-bg{
+ background:
+ linear-gradient(90deg,rgba(9,11,24,.96) 0%,rgba(9,11,24,.76) 48%,rgba(9,11,24,.28) 100%),
+ linear-gradient(0deg,rgba(9,11,24,.9) 0%,transparent 58%),
+ url("https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=2200&q=90") center/cover;
+}
+.hero-eyebrow,.section-label,.category-number,.benefit-number{color:#27d9ff}
+.hero h1 em{background:linear-gradient(100deg,#ffad00,#ff00b7,#28dcff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn-dark{background:linear-gradient(110deg,#ffad00,#ff00b7,#28dcff);color:#080b19;font-weight:700}
+.btn-dark:hover{background:linear-gradient(110deg,#28dcff,#a43cff);color:#fff}
+.btn-outline{border-color:rgba(39,217,255,.5)}
+.btn-outline:hover{background:#27d9ff;color:#090b18}
+.marquee{background:#11152b;color:#eaf7ff;border-top:1px solid rgba(39,217,255,.25);border-bottom:1px solid rgba(164,60,255,.25)}
+.section{background:#f2f4fb}
+.section-dark{background:radial-gradient(ellipse at 80% 10%,rgba(164,60,255,.12),transparent 42%),#090b18}
+.search-area{background:#e6eaf7}
+.search-box input{background:#f8f9ff;border-bottom-color:rgba(39,217,255,.35)}
+.filter.active,.filter:hover{background:#11152b;border-color:#11152b}
+.product-image{background:#e4e8f5}
+.product-badge{background:#11152b}
+.product-badge.gold{background:linear-gradient(110deg,#ffad00,#ff00b7,#28dcff);color:#090b18}
+.product-current-price{color:#7433db}
+.add-cart,.checkout-btn,.modal-add,.order-submit{background:#11152b}
+.add-cart:hover,.checkout-btn:hover,.modal-add:hover,.order-submit:hover{background:linear-gradient(100deg,#a43cff,#27d9ff);color:#090b18}
+.promo-content{background:radial-gradient(ellipse at 100% 0%,rgba(164,60,255,.2),transparent 50%),#090b18}
+.benefits{border-color:rgba(39,217,255,.2)}
+.benefit{border-color:rgba(39,217,255,.16)}
+.footer{background:radial-gradient(ellipse at 0% 0%,rgba(164,60,255,.14),transparent 45%),#090b18}
+.footer-bottom{border-top-color:rgba(39,217,255,.16)}
+.cart,.modal-box,.checkout-box{background:#f2f4fb}
+.cart-head,.cart-total{border-color:rgba(17,21,43,.13)}
+.delivery-box{background:#e6eaf7}
+.payment{border-color:rgba(17,21,43,.16)}
+.success-icon{background:linear-gradient(135deg,#ffad00,#ff00b7,#28dcff);color:#090b18}
+.toast{background:#11152b;border:1px solid rgba(39,217,255,.35)}
+.icon-btn:hover{background:rgba(39,217,255,.2)}
+.cart-count{background:#27d9ff;color:#090b18}
+@media(max-width:700px){.header-brand-logo{width:120px;height:58px}.loader-brand-logo{width:min(240px,75vw)}.footer-brand-logo{width:165px;height:85px}}
+
 </style>
 </head>
 
@@ -1876,7 +1945,7 @@ img{
 
 <div class="loader" id="loader">
     <div class="loader-inner">
-        <div class="loader-logo">ELEGANZO<span style="color:#c7ad7b">.</span>MIR</div>
+        <img class="brand-logo loader-brand-logo" src="assets/eleganzo-logo.png" alt="EleganZO" />
         <div class="loader-line"></div>
         <div class="loader-small">Premium Store</div>
     </div>
@@ -1894,9 +1963,7 @@ img{
 
     <div class="container header-inner">
 
-        <a href="#" class="logo">
-            ELEGANZO<span>.MIR</span>
-        </a>
+        <a href="#" class="logo" aria-label="Eleganzo.mir"><img class="brand-logo header-brand-logo" src="assets/eleganzo-logo.png" alt="EleganZO" /></a>
 
         <nav class="nav">
             <a href="#catalog">Каталог</a>
@@ -2469,7 +2536,7 @@ img{
             <div class="footer-main">
 
                 <div class="footer-logo">
-                    ELEGANZO<span>.MIR</span>
+                    <img class="brand-logo footer-brand-logo" src="assets/eleganzo-logo.png" alt="EleganZO" />
                 </div>
 
                 <p class="footer-desc">
