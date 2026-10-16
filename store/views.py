@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponse, Http404
+from django.http import src="/static/assets/eleganzo-logo.png"onResponse, HttpResponse, Http404
 from django.shortcuts import render
 
 from .models import Product, MediaBlob
