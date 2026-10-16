@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -6,16 +5,17 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "dev-only-change-this-key",
-)
-
+# Основные настройки
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-change-this-key")
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-# Временно разрешаем все хосты, чтобы устранить ошибку 400
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "eleganzo-mir.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
+# Приложения
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -26,8 +26,10 @@ INSTALLED_APPS = [
     "store",
 ]
 
+# Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,7 +57,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
+# База данных: PostgreSQL на Render, SQLite локально,
+# если DATABASE_URL не задан
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
@@ -64,7 +67,7 @@ DATABASES = {
     )
 }
 
-
+# Проверка паролей
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -80,26 +83,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Язык и время
 LANGUAGE_CODE = "ru-ru"
 TIME_ZONE = "Asia/Bishkek"
 USE_I18N = True
 USE_TZ = True
 
+# Статические файлы
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
 
 STORAGES = {
     "default": {
-        "BACKEND": "store.storage.DatabaseStorage",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
+
+# Медиафайлы
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.environ.get(
     "MEDIA_ROOT",
@@ -108,6 +114,7 @@ MEDIA_ROOT = os.environ.get(
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# HTTPS на Render
 SECURE_SSL_REDIRECT = (
     os.environ.get("SECURE_SSL_REDIRECT", "False").lower() == "true"
 )
