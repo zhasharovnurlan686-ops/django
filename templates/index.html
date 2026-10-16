@@ -4312,7 +4312,6 @@ async function submitOrder(event){
         `ИТОГО: ${subtotal+delivery} сом`,
         "",
         `Оплата доставки: ${file ? "чек выбран (" + file.name + "), ожидает проверки" : "чек не загружен, оплата не подтверждена"}`,
-        "Примечание: файл чека не передаётся автоматически в WhatsApp. При необходимости его можно отправить отдельно; прикрепление чека на сайте необязательно."
       ].join("\n");
 
       const order = {number:orderNumber, createdAt:new Date().toISOString(), customer, items, subtotal, delivery, total:subtotal+delivery, receiptFileName:file ? file.name : null, paymentStatus:file ? "Чек выбран — ожидает проверки" : "Чек не загружен — оплата не подтверждена", status:"ОЖИДАЕТ ПРОВЕРКИ ОПЛАТЫ ДОСТАВКИ"};
